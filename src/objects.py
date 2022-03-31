@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from random import randint
 
-from src.utils import unix2datetime
+from utils import unix2datetime
 
 MAX_INTERVAL_LEN = 1000
 

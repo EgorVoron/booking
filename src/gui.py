@@ -7,7 +7,7 @@ from PyQt5.QtCore import *
 
 import datetime
 
-from src.core import get_recommendations, post_booking, get_bookings
+from core import get_recommendations, post_booking, get_bookings
 from utils import qt_time_to_unix
 from objects import Interval
 

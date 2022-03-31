@@ -1,5 +1,5 @@
 from objects import Interval, Room
-from src.db_parser import db
+from db_parser import db
 import time
 
 building2code = {'Любой': None,
