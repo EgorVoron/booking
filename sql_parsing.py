@@ -44,14 +44,14 @@ class sql_parser:
         sqlite_conn.commit()
         sqlite_conn.close()
 
-    def get_booked_intervals(self):
+    def get_booked_intervals(self, after_time):
         sqlite_conn = sqlite3.connect(self.db_name)
         cursor = sqlite_conn.cursor()
         q1 = f"""select distinct room_number, building, start_time, end_time
 from (room
 left outer join room_interval on room.room_id = room_interval.room_id
 left outer join interval on room_interval.interval_id = interval.interval_id)
-where not (start_time is null)"""
+where not (start_time is null) and (end_time > {after_time})"""
         cursor.execute(q1)
         bookings = list(cursor.fetchall())
         print('bookings', bookings)
@@ -61,7 +61,3 @@ where not (start_time is null)"""
 
 
 db = sql_parser()
-
-# if __name__ == '__main__':
-#     # db.book(Room(11, 1, 10, 'lab'), Interval(1648734639, 1648734939))
-#     print(db.book(Room(11, 1, 10, 'lab'), Interval(1648740994, 1648741054)))
