@@ -95,8 +95,6 @@ class Window(QMainWindow):
                 win.same_time = False
                 win.time_problem = False
                 end_warning.setText('')
-            print(end_datetime.dateTime().toPyDateTime())
-            print(start_datetime.dateTime().toPyDateTime())
 
         error_label = QLabel("", self)
         error_label.setGeometry(100, 200, 200, 15)

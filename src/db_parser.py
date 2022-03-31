@@ -54,7 +54,6 @@ left outer join interval on room_interval.interval_id = interval.interval_id)
 where not (start_time is null) and (end_time > {after_time})"""
         cursor.execute(q1)
         bookings = list(cursor.fetchall())
-        print('bookings', bookings)
         sqlite_conn.commit()
         sqlite_conn.close()
         return bookings
