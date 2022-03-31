@@ -26,7 +26,6 @@ class sql_parser:
         sqlite_conn.commit()
         rooms = [Room(*room_list) for room_list in cursor.fetchall()]
         sqlite_conn.close()
-        print('rooms:', rooms)
         return rooms
 
     def book(self, room: Room, interval: Interval):
@@ -37,21 +36,28 @@ class sql_parser:
             print('already exists')
             return
         q1 = f"""insert into interval values ({interval.interval_id}, {interval.start_time}, {interval.end_time})"""
-        print(q1)
         cursor.execute(q1)
         sqlite_conn.commit()
 
         q2 = f"""insert into room_interval values ({room.room_id}, {interval.interval_id})"""
         cursor.execute(q2)
         sqlite_conn.commit()
-        print('b')
-        sqlite_conn.commit()
         sqlite_conn.close()
 
-
-def get_all_rooms(self):
-    self.cursor.execute("""select * from room""")
-    return [Room(*room_list) for room_list in self.cursor.fetchall()]
+    def get_booked_intervals(self):
+        sqlite_conn = sqlite3.connect(self.db_name)
+        cursor = sqlite_conn.cursor()
+        q1 = f"""select distinct room_number, building, start_time, end_time
+from (room
+left outer join room_interval on room.room_id = room_interval.room_id
+left outer join interval on room_interval.interval_id = interval.interval_id)
+where not (start_time is null)"""
+        cursor.execute(q1)
+        bookings = list(cursor.fetchall())
+        print('bookings', bookings)
+        sqlite_conn.commit()
+        sqlite_conn.close()
+        return bookings
 
 
 db = sql_parser()

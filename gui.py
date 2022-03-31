@@ -32,7 +32,6 @@ label.move(250, 100)
 
 line = QtWidgets.QLineEdit(win)
 line.move(350, 100)
-# print(str(combo.currentText()))
 
 
 datetimeedit = QDateTimeEdit()

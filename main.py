@@ -18,3 +18,8 @@ def get_recommendations(start_time, end_time, people_num, building):
 
 def post_booking(room: Room, interval: Interval):
     db.book(room, interval)
+
+
+def get_bookings():
+    bookings = sorted(db.get_booked_intervals(), key=lambda x: f'{x[2]}{x[3]}')
+    return '\n'.join([f'{b[0]}, {b[1]}: {Interval(b[2], b[3])}' for b in bookings[:10]])

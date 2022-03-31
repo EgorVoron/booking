@@ -8,7 +8,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import time
 import sys
-from main import get_recommendations, post_booking
+from main import get_recommendations, post_booking, get_bookings
 import datetime
 from objects import Interval
 
@@ -19,7 +19,7 @@ WIN_HEIGHT = 900
 
 
 def qt_time_to_unix(qt_time):
-    return int(time.mktime(qt_time.dateTime().toPyDateTime().timetuple()))
+    return int(time.mktime((qt_time.dateTime().toPyDateTime() + datetime.timedelta(hours=3)).timetuple()))
 
 
 class Window(QMainWindow):
@@ -119,19 +119,23 @@ class Window(QMainWindow):
         button.setGeometry(100, 250, 200, 50)
 
         to_book = QLabel("Выберите комнату для бронирования:", self)
-        to_book.setGeometry(100, 500, 500, 100)
+        to_book.setGeometry(100, 300, 500, 30)
         to_book.setWordWrap(True)
         to_book.setHidden(True)
 
         combo2 = QtWidgets.QComboBox(self)
-        combo2.move(200, 500)
+        combo2.move(380, 300)
         combo2.setHidden(True)
 
         book_button = QtWidgets.QPushButton(self)
         book_button.clicked.connect(lambda: book())
         book_button.setText("Забронировать!")
-        book_button.setGeometry(100, 700, 200, 50)
+        book_button.setGeometry(100, 350, 200, 50)
         book_button.setHidden(True)
+
+        bookings_label = QtWidgets.QLabel(f'Ваши брони: \n{get_bookings()}', self)
+        bookings_label.setGeometry(100, 450, 300, 200)
+        bookings_label.setHidden(False)
 
         def run(win=self):
             if not line.text():
@@ -172,9 +176,12 @@ class Window(QMainWindow):
                 book_button.setHidden(False)
 
         def book(win=self):
-            post_booking(self.valid_rooms[self.valid_rooms_text.index(combo2.currentText())],
-                         Interval(self.start_time,
-                                  self.end_time))
+            room = self.valid_rooms[self.valid_rooms_text.index(combo2.currentText())]
+            interval = Interval(self.start_time,
+                                self.end_time)
+            post_booking(room,
+                         interval)
+            bookings_label.setText(bookings_label.text() + f'\n{combo2.currentText()}: {str(interval)}')
             to_book.setHidden(True)
             combo2.setHidden(True)
             book_button.setHidden(True)
