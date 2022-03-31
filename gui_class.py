@@ -151,11 +151,22 @@ class Window(QMainWindow):
                                                   end_time=self.end_time,
                                                   people_num=int(line.text()),
                                                   building=str(combo.currentText()))
+                if not valid_rooms:
+                    to_book.setHidden(True)
+                    combo2.setHidden(True)
+                    book_button.setHidden(True)
+                    msg = QMessageBox(self)
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("Свободных аудиторий в указанный интервал не найдено. Попробуйте другой интервал")
+                    msg.setWindowTitle("Не найдено")
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.exec_()
+                    return
                 self.valid_rooms = valid_rooms
                 valid_rooms_text = '\n'.join([f'{room.room_number}, {room.building}' for room in valid_rooms[:10]])
                 self.valid_rooms_text = valid_rooms_text
-                # result_rooms.setText(valid_rooms_text)
                 to_book.setHidden(False)
+                combo2.clear()
                 combo2.addItems([f'{room.room_number}, {room.building}' for room in valid_rooms[:10]])
                 combo2.setHidden(False)
                 book_button.setHidden(False)
@@ -164,6 +175,17 @@ class Window(QMainWindow):
             post_booking(self.valid_rooms[self.valid_rooms_text.index(combo2.currentText())],
                          Interval(self.start_time,
                                   self.end_time))
+            to_book.setHidden(True)
+            combo2.setHidden(True)
+            book_button.setHidden(True)
+
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Успешно забронировано!")
+            msg.setWindowTitle("Готово")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+            # msg.buttonClicked.connect(msgbtn)
 
 
 App = QApplication(sys.argv)

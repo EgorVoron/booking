@@ -4,7 +4,7 @@ from objects import Interval, Room
 
 class sql_parser:
     def __init__(self):
-        self.db_name = '5c.db'
+        self.db_name = '1c.db'
 
     def get_recommended_rooms(self, start_time, end_time, people_num, building=None):
         sqlite_conn = sqlite3.connect(self.db_name)
@@ -24,12 +24,18 @@ class sql_parser:
             """
         )
         sqlite_conn.commit()
-        return [Room(*room_list) for room_list in cursor.fetchall()]
+        rooms = [Room(*room_list) for room_list in cursor.fetchall()]
+        sqlite_conn.close()
+        print('rooms:', rooms)
+        return rooms
 
     def book(self, room: Room, interval: Interval):
         sqlite_conn = sqlite3.connect(self.db_name)
         cursor = sqlite_conn.cursor()
-        print('a')
+        valid_rooms = self.get_recommended_rooms(interval.start_time, interval.end_time, room.capacity, room.building)
+        if room.room_id not in [valid_room.room_id for valid_room in valid_rooms]:
+            print('already exists')
+            return
         q1 = f"""insert into interval values ({interval.interval_id}, {interval.start_time}, {interval.end_time})"""
         print(q1)
         cursor.execute(q1)
@@ -49,4 +55,7 @@ def get_all_rooms(self):
 
 
 db = sql_parser()
-# db.book(None, Interval(1648734639, 1648734939))
+
+# if __name__ == '__main__':
+#     # db.book(Room(11, 1, 10, 'lab'), Interval(1648734639, 1648734939))
+#     print(db.book(Room(11, 1, 10, 'lab'), Interval(1648740994, 1648741054)))
