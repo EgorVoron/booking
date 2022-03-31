@@ -4,7 +4,7 @@ from objects import Interval, Room
 
 class ParserSQL:
     def __init__(self):
-        self.db_name = '../1c.db'
+        self.db_name = 'src/data.db'
 
     def get_recommended_rooms(self, start_time, end_time, people_num, building=None):
         sqlite_conn = sqlite3.connect(self.db_name)
