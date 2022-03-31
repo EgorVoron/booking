@@ -1,25 +1,18 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QDateTimeEdit
-from PyQt5.QtCore import QDateTime, QTime
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QDesktopWidget, QDateTimeEdit
+from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import *
-from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import time
-import sys
-from main import get_recommendations, post_booking, get_bookings
-import datetime
-from objects import Interval
 
-import sys
+import datetime
+
+from src.core import get_recommendations, post_booking, get_bookings
+from utils import qt_time_to_unix
+from objects import Interval
 
 WIN_WIDTH = 1200
 WIN_HEIGHT = 900
-
-
-def qt_time_to_unix(qt_time):
-    return int(time.mktime((qt_time.dateTime().toPyDateTime() + datetime.timedelta(hours=3)).timetuple()))
 
 
 class Window(QMainWindow):
@@ -30,12 +23,10 @@ class Window(QMainWindow):
         self.setGeometry(center.x() - WIN_WIDTH // 2, center.y() - WIN_HEIGHT // 2, WIN_WIDTH, WIN_HEIGHT)
         self.UiComponents()
         self.show()
-
-    # method for components
-    def UiComponents(self):
         self.time_problem = False
         self.same_time = True
 
+    def UiComponents(self):
         building_label = QtWidgets.QLabel(self)
         building_label.setText("Корпус:")
         building_label.adjustSize()
@@ -55,8 +46,8 @@ class Window(QMainWindow):
 
         line = QtWidgets.QLineEdit(self)
         line.move(350, 100)
-        onlyInt = QIntValidator()
-        line.setValidator(onlyInt)
+        only_int = QIntValidator()
+        line.setValidator(only_int)
 
         start_datetime = QDateTimeEdit(self)
         start_datetime.setGeometry(580, 100, 150, 30)
@@ -109,9 +100,6 @@ class Window(QMainWindow):
 
         error_label = QLabel("", self)
         error_label.setGeometry(100, 200, 200, 15)
-
-        # result_rooms = QLabel("", self)
-        # result_rooms.setGeometry(100, 300, 500, 100)
 
         button = QtWidgets.QPushButton(self)
         button.clicked.connect(lambda: run())
@@ -175,7 +163,7 @@ class Window(QMainWindow):
                 combo2.setHidden(False)
                 book_button.setHidden(False)
 
-        def book(win=self):
+        def book():
             room = self.valid_rooms[self.valid_rooms_text.index(combo2.currentText())]
             interval = Interval(self.start_time,
                                 self.end_time)
@@ -192,9 +180,3 @@ class Window(QMainWindow):
             msg.setWindowTitle("Готово")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
-            # msg.buttonClicked.connect(msgbtn)
-
-
-App = QApplication(sys.argv)
-window = Window()
-sys.exit(App.exec())

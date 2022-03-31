@@ -1,12 +1,9 @@
 from dataclasses import dataclass
 from random import randint
-import datetime
+
+from src.utils import unix2datetime
 
 MAX_INTERVAL_LEN = 1000
-
-
-def unix2datetime(time):
-    return datetime.datetime.utcfromtimestamp(time).strftime('%d.%m %H:%M')
 
 
 class Interval:
