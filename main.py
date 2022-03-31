@@ -19,6 +19,10 @@ def get_recommendations(start_time, end_time, people_num, building):
 
     return rooms
 
+
+def post_booking(room: Room, interval: Interval):
+    db.book(room, interval)
+
 # try:
 #     interval = Interval(start_time, end_time)
 # except ValueError as ex:

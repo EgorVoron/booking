@@ -8,13 +8,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import time
 import sys
-from main import get_recommendations
+from main import get_recommendations, post_booking
 import datetime
+from objects import Interval
 
 import sys
 
 WIN_WIDTH = 1200
-WIN_HEIGHT = 700
+WIN_HEIGHT = 900
 
 
 def qt_time_to_unix(qt_time):
@@ -109,6 +110,29 @@ class Window(QMainWindow):
         error_label = QLabel("", self)
         error_label.setGeometry(100, 200, 200, 15)
 
+        # result_rooms = QLabel("", self)
+        # result_rooms.setGeometry(100, 300, 500, 100)
+
+        button = QtWidgets.QPushButton(self)
+        button.clicked.connect(lambda: run())
+        button.setText("Найти подходящие комнаты")
+        button.setGeometry(100, 250, 200, 50)
+
+        to_book = QLabel("Выберите комнату для бронирования:", self)
+        to_book.setGeometry(100, 500, 500, 100)
+        to_book.setWordWrap(True)
+        to_book.setHidden(True)
+
+        combo2 = QtWidgets.QComboBox(self)
+        combo2.move(200, 500)
+        combo2.setHidden(True)
+
+        book_button = QtWidgets.QPushButton(self)
+        book_button.clicked.connect(lambda: book())
+        book_button.setText("Забронировать!")
+        book_button.setGeometry(100, 700, 200, 50)
+        book_button.setHidden(True)
+
         def run(win=self):
             if not line.text():
                 error_label.setText('Введите число людей!')
@@ -118,27 +142,28 @@ class Window(QMainWindow):
                 print('Исправьте время')
             elif win.same_time:
                 error_label.setText('Время начала и конца совпадает!')
-                print('Иремя начала и конц')
+                print('Время начала и конца совпадает!')
             else:
-                print('h')
                 error_label.setText('')
-                get_recommendations(start_time=qt_time_to_unix(start_datetime),
-                                    end_time=qt_time_to_unix(end_datetime),
-                                    people_num=int(line.text()),
-                                    building=str(combo.currentText()))
-                self.show_results()
-            res_lab = QLabel("ПИЗДА", win)
-            res_lab.setGeometry(100, 200, 200, 15)
+                self.start_time = qt_time_to_unix(start_datetime)
+                self.end_time = qt_time_to_unix(end_datetime)
+                valid_rooms = get_recommendations(start_time=self.start_time,
+                                                  end_time=self.end_time,
+                                                  people_num=int(line.text()),
+                                                  building=str(combo.currentText()))
+                self.valid_rooms = valid_rooms
+                valid_rooms_text = '\n'.join([f'{room.room_number}, {room.building}' for room in valid_rooms[:10]])
+                self.valid_rooms_text = valid_rooms_text
+                # result_rooms.setText(valid_rooms_text)
+                to_book.setHidden(False)
+                combo2.addItems([f'{room.room_number}, {room.building}' for room in valid_rooms[:10]])
+                combo2.setHidden(False)
+                book_button.setHidden(False)
 
-        button = QtWidgets.QPushButton(self)
-        button.clicked.connect(lambda: run())
-        button.setText("Найти подходящие комнаты")
-        button.setGeometry(100, 250, 200, 50)
-
-    def show_results(self):
-        button = QtWidgets.QPushButton(self)
-        button.setText("Найти adsasda комнаты")
-        button.setGeometry(100, 300, 200, 50)
+        def book(win=self):
+            post_booking(self.valid_rooms[self.valid_rooms_text.index(combo2.currentText())],
+                         Interval(self.start_time,
+                                  self.end_time))
 
 
 App = QApplication(sys.argv)
