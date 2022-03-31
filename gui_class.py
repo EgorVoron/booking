@@ -67,15 +67,7 @@ class Window(QMainWindow):
         self.start_warning = QLabel("", self)
         self.start_warning.setGeometry(580, 140, 200, 60)
         self.start_warning.setWordWrap(True)
-        self.start_datetime.dateTimeChanged.connect(lambda: dt_method(self.start_datetime))
-
-        def dt_method(start_datetime, win=self):
-            if start_datetime.dateTime().toPyDateTime() < datetime.datetime.now():
-                self.start_warning.setText('Время начала не может быть раньше текущего!')
-                win.time_problem = True
-            else:
-                win.time_problem = False
-                self.start_warning.setText('')
+        self.start_datetime.dateTimeChanged.connect(lambda: self.dt_method(self.start_datetime))
 
         self.end_datetime = QDateTimeEdit(self)
         self.end_datetime.setDateTime(self.cur_dt)
@@ -93,6 +85,17 @@ class Window(QMainWindow):
         button.setText("Найти подходящие комнаты")
         button.setGeometry(100, 250, 200, 50)
 
+        error_label = QLabel("", self)
+        error_label.setGeometry(100, 200, 200, 15)
+
+    def dt_method(self, start_datetime):
+        if start_datetime.dateTime().toPyDateTime() < datetime.datetime.now():
+            self.start_warning.setText('Время начала не может быть раньше текущего!')
+            self.time_problem = True
+        else:
+            self.time_problem = False
+            self.start_warning.setText('')
+
     def dt_method2(self, end_datetime):
         if end_datetime.dateTime().toPyDateTime() < self.start_datetime.dateTime().toPyDateTime():
             self.end_warning.setText('Время конца не может быть меньше времени начала!')
@@ -108,13 +111,9 @@ class Window(QMainWindow):
             self.same_time = False
             self.time_problem = False
             self.end_warning.setText('')
-    print(end_datetime.dateTime().toPyDateTime())
-    print(self.start_datetime.dateTime().toPyDateTime())
-
-    error_label = QLabel("", self)
-    error_label.setGeometry(100, 200, 200, 15)
 
     def run(self):
+        print(self.line.text())
         if not self.line.text():
             self.error_label.setText('Введите число людей!')
             print('Введите число людей!')
@@ -130,8 +129,6 @@ class Window(QMainWindow):
                                 end_time=qt_time_to_unix(self.end_datetime),
                                 people_num=int(self.line.text()),
                                 building=str(self.combo.currentText()))
-
-
 
 
 App = QApplication(sys.argv)
