@@ -4,12 +4,12 @@ from objects import Interval, Room
 
 class sql_parser:
     def __init__(self):
-        db_name = '2c.db'
-        self.sqlite_conn = sqlite3.connect(db_name)
-        self.cursor = self.sqlite_conn.cursor()
+        self.db_name = '5c.db'
 
     def get_recommended_rooms(self, start_time, end_time, people_num, building=None):
-        self.cursor.execute(
+        sqlite_conn = sqlite3.connect(self.db_name)
+        cursor = sqlite_conn.cursor()
+        cursor.execute(
             f"""select room_id, room_number, capacity, building 
         from room 
         where (capacity >= {people_num} and room_id not in (
@@ -23,18 +23,24 @@ class sql_parser:
         )
             """
         )
-        return [Room(*room_list) for room_list in self.cursor.fetchall()]
+        sqlite_conn.commit()
+        return [Room(*room_list) for room_list in cursor.fetchall()]
 
     def book(self, room: Room, interval: Interval):
+        sqlite_conn = sqlite3.connect(self.db_name)
+        cursor = sqlite_conn.cursor()
         print('a')
         q1 = f"""insert into interval values ({interval.interval_id}, {interval.start_time}, {interval.end_time})"""
         print(q1)
-        self.cursor.execute(q1)
+        cursor.execute(q1)
+        sqlite_conn.commit()
+
         q2 = f"""insert into room_interval values ({room.room_id}, {interval.interval_id})"""
-        self.cursor.execute(q2)
-        self.sqlite_conn.commit()
-        self.cursor.close()
+        cursor.execute(q2)
+        sqlite_conn.commit()
         print('b')
+        sqlite_conn.commit()
+        sqlite_conn.close()
 
 
 def get_all_rooms(self):
@@ -43,3 +49,4 @@ def get_all_rooms(self):
 
 
 db = sql_parser()
+# db.book(None, Interval(1648734639, 1648734939))
